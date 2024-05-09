@@ -1,0 +1,49 @@
+name: Connect4 - Automatic version control. Docker image build and publishing to DockerHub
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+jobs:
+  build:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Review code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+
+      - name: Bump version and push tag
+        id: github_tag
+        uses: anothrNick/github-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_SUPER }}
+          WITH_V: true
+
+      - name: Login to DockerHub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_TOKEN
+
+      - name: Build Docker Image
+        env:
+          NEW_VERSION: ${{ steps.github_tag.outputs.new_tag }}
+        run: |
+          docker build --tag miguetheking/connect4:$NEW_VERSION .
+          docker build --tag miguetheking/connect4:latest .
+
+        # Requiere previamente la creación del repositorio de Dockerhub para poder subir la imagen
+      - name: Publish image to DockerHub
+        env:
+          NEW_VERSION: ${{ steps.github_tag.outputs.new_tag }}
+        run: |
+          docker push miguetheking/connect4:$NEW_VERSION
+          docker push miguetheking/connect4:latest
