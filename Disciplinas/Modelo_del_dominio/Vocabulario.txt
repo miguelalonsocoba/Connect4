@@ -1,0 +1,45 @@
+@startuml
+title Vocabulary
+class Connect4
+class Player
+class Board
+class Token
+class Row
+class Column
+class Turn
+class Aggregation
+enum Color {
+  Red
+  Yellow
+}
+enum Goal {
+  Horizontal
+  Vertical
+  Diagonal
+}
+note right: Align four consecutive\npieces of the same color.
+
+Connect4 *-- "2" Player
+Connect4 *-- Board
+Connect4 *-- "2x21" Token
+Connect4 *-- Turn
+
+Board *-- "6" Row
+Board *-- "7" Column
+Board o-- "0-2x21"Token
+
+Player *-- Goal
+Player ..> "21" Token
+Player ..> Aggregation
+
+Token --> Color
+
+Turn -->  Player : active
+
+Aggregation --> Column : select
+Aggregation --> Row : last row empty
+Aggregation ..> Token
+
+Goal *--> "4" Token
+
+@enduml
