@@ -1,0 +1,23 @@
+@startuml
+title Stepts to play - Activity Diagram
+start
+ repeat
+  :add Yellow Token;
+  :add Red Token;
+ repeat while (are there 3 yellow tokens on the board?) is (no) not (yes)
+ :add Yellow;
+ while (Is it connect4 for yellow tokens?) is (no)
+   if (Is the board complete?) then (yes)
+     :tie;
+     stop
+   else (no)
+     :add Red;
+     if (Is it connect4 for red tokens?) then (yes)
+       stop
+     else (no)
+       :add Yellow;
+     endif
+   endif
+ endwhile (yes)
+stop
+@enduml
