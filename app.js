@@ -131,8 +131,17 @@ function initGameView() {
         const checker = initChecker(this.getCells());
 
         // Cambiar la condicionales por un ciclo for en el clual se repetira mientras no sea conecta4, la clase checker tendra un unico metodo review
-        let isConnect4 = checker.review(HORIZONTAL, coordinateOfLastTokenPlaced);
-        console.writeln(`Is Connect4: ${isConnect4}`);
+        if (checker.review(HORIZONTAL, coordinateOfLastTokenPlaced)) {
+          console.writeln(`Is Connect4 Horizontal: ${true}`);
+        } else if (checker.review(VERTICAL, coordinateOfLastTokenPlaced)){
+          console.writeln(`Is Connect4 Vertical: ${true}`);
+        } else if (checker.review(DIAGONAL, coordinateOfLastTokenPlaced)){
+          console.writeln(`Is Connect4 Diagonal: ${true}`);
+        } else if (checker.review(DIAGONAL_INVERTED, coordinateOfLastTokenPlaced)){
+          console.writeln(`Is Connect4 Diagonal invert: ${true}`);
+        } else {
+          console.writeln(`Is Connect4: ${false}`);
+        }
       },
       isTie: function () {
         for (let i = 0; i < NUMBER_ROWS; i++) {
@@ -225,30 +234,28 @@ function initGameView() {
   }
 
   function initChecker(cells) {
+
+    function isWithinTheRange(coordinate) {
+      let RANGE_X = 6;
+      let RANGE_Y =5;
+      return coordinate.getAxisX() <= RANGE_X && coordinate.getAxisY() <= RANGE_Y;
+    }
+
     return {
-      review: function (directions, coordinateOfLastTokenPlaced) {
-        console.writeln(
-          `Coordinate of last token placed: ${coordinateOfLastTokenPlaced.getAxisX()}, ${coordinateOfLastTokenPlaced.getAxisY()}`
-        );
-        // [[1, 0], [-1, 0]], (3, 2)
-        let copyCoordinate = coordinateOfLastTokenPlaced.generateCopy(); // 3, 2
-        let isConnect4 = false; // false
-        let counter = 1; // 4
-        for (let i = 0; !isConnect4 && i < directions.length; i++) {
-          // 0; false && true; 0
-          copyCoordinate = copyCoordinate.asYouAreDisplacedIn(directions[i]); //(6, 2)
-          console.writeln(`Copy coordinate: ${copyCoordinate.getAxisX()}, ${copyCoordinate.getAxisY()}`);
-          if (
-            cells[copyCoordinate.getAxisX()][copyCoordinate.getAxisY()] ===
-            cells[coordinateOfLastTokenPlaced.getAxisX()][coordinateOfLastTokenPlaced.getAxisY()]
-          ) {
-            counter++;
+      review: function (directions, coordinateOfLastTokenPlaced) {// [0, 1],[0, -1], (6, 5)
+        let count = 1;// 1
+        let displacedCoordinate;
+        for (let i = 0; i < directions.length; i++) { // i = 0; true
+          displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplacedIn(directions[i]);//(6, 6)
+          while (isWithinTheRange(displacedCoordinate) && cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] === cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]) { //false && (6, 5) === (5, 5) = R === R
+            count++;
+            displacedCoordinate = displacedCoordinate.asYouAreDisplacedIn(directions[i]);
           }
-          if (counter === 4) {
-            isConnect4 = true;
+          if (count === 4) {
+            return true;
           }
         }
-        return isConnect4;
+        return false;
       },
     };
   }
