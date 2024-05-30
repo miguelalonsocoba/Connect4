@@ -5,6 +5,7 @@ class Connect4View {
 }
 
 class GameView {
+  - array[] tokens
   - void getValidAndNonFullColumn()
   + void play()
 }
@@ -17,6 +18,7 @@ class YesNoDialogView {
   + isAffirmative()
   - isNegative()
 }
+
 class BoardView {
   - Board Board
   
@@ -39,9 +41,6 @@ class Board {
   + boolean isColumnComplete(columnNumber)
   
   - void generateCells()
-  - boolean verifyHorizontalVertical()
-  - boolean verifyDiagonal()
-  - boolean verifyDiagonalInvert()
 }
 class Player {
   - string token
@@ -60,10 +59,20 @@ class Turn {
 }
 
 class Checker {
+  - array[][] cells
   
+  + boolean review(directions, coordinateOfLastTokenPlaced)
+  
+  - boolean isWithinTheRange(coordinate)
 }
-class Coordinate {}
-class Direction {}
+class Coordinate {
+  - number axisX
+  - number axisY
+  
+  + number getAxisX()
+  + number getAxisY()
+  + Coordinate asYpuAreDisplacedIn(direction)
+}
 
 Connect4View --> YesNoDialogView
 Connect4View *-- GameView
@@ -79,5 +88,7 @@ BoardView --> Board
 Board --> "2" Player
 Board ..> Checker
 
-Direction *-- Coordinate
+PlayerView ..> Board
+
+Checker ..> Coordinate
 @enduml

@@ -94,13 +94,13 @@ function initGameView() {
         console.writeln("----------------------");
       },
       showWinningMessage: function () {
-        console.writeln(`Falicidades gano el jugador ${turn.getTurn() + 1}`);
+        console.writeln(`Felicidades gano el jugador ${turn.getTurn() + 1}`);
       },
     };
   }
 
   function initBoard() {
-    const NUMBER_ROWS = 6; //Quitar los get de las constantes y ponerlas como atributos publicos, verificar una vez colocadas como publicas si se pueden acceder desde el metodo privado
+    const NUMBER_ROWS = 6;
     const NUMBER_COLUMNS = 7;
     const EMPTY_CHARACTER = " ";
     let cells;
@@ -123,24 +123,18 @@ function initGameView() {
         return countAttempts;
       },
       isConnect4: function (coordinateOfLastTokenPlaced) {
-        // console.writeln(`Coordinate: ${coordinateOfLastTokenPlaced.getAxisX()}, ${coordinateOfLastTokenPlaced.getAxisY()}`);
-        const HORIZONTAL = [initCoordinate(1, 0), initCoordinate(-1, 0)];
-        const VERTICAL = [initCoordinate(0, 1), initCoordinate(0, -1)];
-        const DIAGONAL = [initCoordinate(1, 1), initCoordinate(-1, -1)];
-        const DIAGONAL_INVERTED = [initCoordinate(-1, 1), initCoordinate(1, -1)];
         const checker = initChecker(this.getCells());
-
-        // Cambiar la condicionales por un ciclo for en el clual se repetira mientras no sea conecta4, la clase checker tendra un unico metodo review
-        if (checker.review(HORIZONTAL, coordinateOfLastTokenPlaced)) {
-          console.writeln(`Is Connect4 Horizontal: ${true}`);
-        } else if (checker.review(VERTICAL, coordinateOfLastTokenPlaced)){
-          console.writeln(`Is Connect4 Vertical: ${true}`);
-        } else if (checker.review(DIAGONAL, coordinateOfLastTokenPlaced)){
-          console.writeln(`Is Connect4 Diagonal: ${true}`);
-        } else if (checker.review(DIAGONAL_INVERTED, coordinateOfLastTokenPlaced)){
-          console.writeln(`Is Connect4 Diagonal invert: ${true}`);
-        } else {
-          console.writeln(`Is Connect4: ${false}`);
+        let directions = [
+          [initCoordinate(1, 0), initCoordinate(-1, 0)],
+          [initCoordinate(0, 1), initCoordinate(0, -1)],
+          [initCoordinate(1, 1), initCoordinate(-1, -1)],
+          [initCoordinate(-1, 1), initCoordinate(1, -1)],
+        ];
+        for (let i = 0; i < directions.length; i++) {
+          if (checker.review(directions[i], coordinateOfLastTokenPlaced)) {
+            console.writeln(`It is Connect4 fron FOR: ${true}`);
+            console.writeln(`Directions: (${directions[i][0].getAxisX()}, ${directions[i][0].getAxisY()}) (${directions[i][1].getAxisX()}, ${directions[i][1].getAxisY()})`);
+          }
         }
       },
       isTie: function () {
@@ -203,13 +197,11 @@ function initGameView() {
   function initPlayerView() {
     return {
       getValidColumn: function () {
-        const MINIMUM_COLUMN = 1;
-        const MAXIMUM_COLUMN = 7;
         let error;
         let columnNumber;
         do {
           columnNumber = console.readNumber("Selecciona una columna para insertar ficha: ");
-          error = columnNumber < MINIMUM_COLUMN || MAXIMUM_COLUMN < columnNumber;
+          error = columnNumber < initBoard().getNumberColumns() - initBoard().getNumberRows() || initBoard().getNumberColumns() < columnNumber;
           if (error) {
             console.writeln("Error!!! - Por favor elige una columna entre 1 y 7");
           }
@@ -242,12 +234,12 @@ function initGameView() {
     }
 
     return {
-      review: function (directions, coordinateOfLastTokenPlaced) {// [0, 1],[0, -1], (6, 5)
+      review: function (directions, coordinateOfLastTokenPlaced) {
         let count = 1;// 1
         let displacedCoordinate;
-        for (let i = 0; i < directions.length; i++) { // i = 0; true
-          displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplacedIn(directions[i]);//(6, 6)
-          while (isWithinTheRange(displacedCoordinate) && cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] === cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]) { //false && (6, 5) === (5, 5) = R === R
+        for (let i = 0; i < directions.length; i++) {
+          displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplacedIn(directions[i]);
+          while (isWithinTheRange(displacedCoordinate) && cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] === cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]) {
             count++;
             displacedCoordinate = displacedCoordinate.asYouAreDisplacedIn(directions[i]);
           }
@@ -267,12 +259,6 @@ function initGameView() {
       },
       getAxisY: function () {
         return axisY;
-      },
-      moveTo: function (coordinate) {
-        return initCoordinate(axisX + coordinate.getAxisX(), axisY + coordinate.getAxisY());
-      },
-      generateCopy: function () {
-        return initCoordinate(axisX, axisY);
       },
       asYouAreDisplacedIn: function (direction) {
         return initCoordinate(axisX + direction.getAxisX(), axisY + direction.getAxisY());
