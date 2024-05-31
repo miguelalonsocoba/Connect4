@@ -35,10 +35,10 @@ class Board {
   + number getNumberAttempts(activePlayer)
   + boolan isConnect4(token)
   + boolean isTie()
-  + void addEmptyColumn(token, column)
+  + void add(token, column)
   + number getNumberRows()
   + number getNumberColumns()
-  + boolean isColumnComplete(columnNumber)
+  + boolean isThereAGap(column)
   
   - void generateCells()
 }
@@ -89,6 +89,9 @@ Board --> "2" Player
 Board ..> Checker
 
 PlayerView ..> Board
+PlayerView ..> Player
 
 Checker ..> Coordinate
+
+Turn --> "2" Player
 @enduml

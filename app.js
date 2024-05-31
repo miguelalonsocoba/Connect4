@@ -49,25 +49,30 @@ function initGameView() {
 
   function getValidAndNonFullColumn() {
     let columnComplete;
-    let validColumn;
+    let column;
     do {
-      validColumn = playerView.getValidColumn();
-      columnComplete = board.isColumnComplete(validColumn);
+      column = playerView.getValidColumn(players[turn.getTurn()]);
+      columnComplete = board.isThereAGap(column);
       if (columnComplete) {
         console.writeln("La columna elegida ya esta completa. !!!ELIGUE OTRA COLUMNA!!!");
       }
     } while (columnComplete);
-    return validColumn;
+    return column;
   }
 
   return {
     play: function () {
       let winner = false;
+      boardView.show();
       while (!winner && !board.isTie()) {
-        boardView.show();
         let columnToInsertToken = getValidAndNonFullColumn();
-        let coordinateOfLastTokenPlaced = board.addInEmptyColumn(players[turn.getTurn()].getToken(), columnToInsertToken);
-        winner = board.isConnect4(coordinateOfLastTokenPlaced);
+        board.add(players[turn.getTurn()].getToken(), columnToInsertToken);
+        let coordinateOfLastAddedToken = board.getCoordinateOfLastAddedToken(
+          players[turn.getTurn()].getToken(),
+          columnToInsertToken
+        );
+        winner = board.isConnect4(coordinateOfLastAddedToken);
+        boardView.show();
         if (!winner && !board.isTie()) {
           turn.nextTurn();
         }
@@ -124,18 +129,24 @@ function initGameView() {
       },
       isConnect4: function (coordinateOfLastTokenPlaced) {
         const checker = initChecker(this.getCells());
+        // let directions = [
+        //   [initCoordinate(1, 0), initCoordinate(-1, 0)],
+        //   [initCoordinate(0, 1), initCoordinate(0, -1)],
+        //   [initCoordinate(1, 1), initCoordinate(-1, -1)],
+        //   [initCoordinate(-1, 1), initCoordinate(1, -1)],
+        // ];
         let directions = [
           [initCoordinate(1, 0), initCoordinate(-1, 0)],
           [initCoordinate(0, 1), initCoordinate(0, -1)],
-          [initCoordinate(1, 1), initCoordinate(-1, -1)],
+          [initCoordinate(1, 1), initCoordinate(-1, -1)], ////
           [initCoordinate(-1, 1), initCoordinate(1, -1)],
         ];
         for (let i = 0; i < directions.length; i++) {
           if (checker.review(directions[i], coordinateOfLastTokenPlaced)) {
-            console.writeln(`It is Connect4 fron FOR: ${true}`);
-            console.writeln(`Directions: (${directions[i][0].getAxisX()}, ${directions[i][0].getAxisY()}) (${directions[i][1].getAxisX()}, ${directions[i][1].getAxisY()})`);
+            return true;
           }
         }
+        return false;
       },
       isTie: function () {
         for (let i = 0; i < NUMBER_ROWS; i++) {
@@ -147,17 +158,22 @@ function initGameView() {
         }
         return true;
       },
-      addInEmptyColumn: function (token, column) {
-        let lastInsertedToken;
+      add: function (token, column) {
         let placedToken = false;
         for (let i = NUMBER_ROWS - 1; !placedToken && i >= 0; i--) {
-          if (cells[i][column] === " ") {
+          if (cells[i][column] === EMPTY_CHARACTER) {
             cells[i][column] = token;
             placedToken = true;
-            lastInsertedToken = initCoordinate(column, i);
           }
         }
-        return lastInsertedToken;
+      },
+      getCoordinateOfLastAddedToken: function (token, column) {
+        for (let i = 0; i < NUMBER_COLUMNS; i++) {
+          if (cells[i][column] === token) {
+            return initCoordinate(column, i);
+          }
+        }
+        return coordinateOfLastAddedToken;
       },
       getNumberRows: function () {
         return NUMBER_ROWS;
@@ -165,10 +181,10 @@ function initGameView() {
       getNumberColumns: function () {
         return NUMBER_COLUMNS;
       },
-      isColumnComplete: function (columnNumber) {
+      isThereAGap: function (column) {
         // Cambiar el nombre por "hay hueco en esta columna"
         let firstRow = 0;
-        if (cells[firstRow][columnNumber] !== " ") {
+        if (cells[firstRow][column] !== EMPTY_CHARACTER) {
           return true;
         }
         return false;
@@ -196,17 +212,21 @@ function initGameView() {
 
   function initPlayerView() {
     return {
-      getValidColumn: function () {
+      getValidColumn: function (player) {
         let error;
         let columnNumber;
         do {
-          columnNumber = console.readNumber("Selecciona una columna para insertar ficha: ");
-          error = columnNumber < initBoard().getNumberColumns() - initBoard().getNumberRows() || initBoard().getNumberColumns() < columnNumber;
+          columnNumber = console.readNumber(
+            `Selecciona una columna para insertar FICHA ${player.getToken() === "R" ? "ROJA" : "AMARILLA"}: `
+          ); // Remplazar el String  "R" por algun atributo estatico
+          error =
+            columnNumber < initBoard().getNumberColumns() - initBoard().getNumberRows() ||
+            initBoard().getNumberColumns() < columnNumber;
           if (error) {
             console.writeln("Error!!! - Por favor elige una columna entre 1 y 7");
           }
         } while (error);
-        return columnNumber - 1;
+        return columnNumber - (initBoard().getNumberColumns() - initBoard().getNumberRows());
       },
     };
   }
@@ -226,20 +246,27 @@ function initGameView() {
   }
 
   function initChecker(cells) {
-
     function isWithinTheRange(coordinate) {
       let RANGE_X = 6;
-      let RANGE_Y =5;
+      let RANGE_Y = 5;
       return coordinate.getAxisX() <= RANGE_X && coordinate.getAxisY() <= RANGE_Y;
     }
 
     return {
       review: function (directions, coordinateOfLastTokenPlaced) {
-        let count = 1;// 1
+        console.writeln(`Direction 1: ${directions[0].getAxisX()}, ${directions[0].getAxisY()}`);
+        console.writeln(`Direction 2: ${directions[1].getAxisX()}, ${directions[1].getAxisY()}`);
+        console.writeln(`Coordinate: ${coordinateOfLastTokenPlaced.getAxisX()}, ${coordinateOfLastTokenPlaced.getAxisY()}`);
+        let count = 1; // 1
         let displacedCoordinate;
         for (let i = 0; i < directions.length; i++) {
           displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplacedIn(directions[i]);
-          while (isWithinTheRange(displacedCoordinate) && cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] === cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]) {
+          console.writeln(`Displaced Coordinate: ${displacedCoordinate.getAxisX()}, ${displacedCoordinate.getAxisY()}`);
+          while (
+            isWithinTheRange(displacedCoordinate) &&
+            cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] ===
+              cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]
+          ) {
             count++;
             displacedCoordinate = displacedCoordinate.asYouAreDisplacedIn(directions[i]);
           }
