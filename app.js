@@ -42,8 +42,7 @@ function initYesNoDialogView(question) {
 function initGameView() {
   const board = initBoard();
   const boardView = initBoardView(board);
-  let tokens = ["R", "Y"];
-  const players = [initPlayer(tokens[0]), initPlayer(tokens[1])];
+  const players = [initPlayer(initToken().getRedToken()), initPlayer(initToken().getYellowToken())];
   const playerView = initPlayerView();
   const turn = initTurn();
 
@@ -106,7 +105,7 @@ function initGameView() {
 
   function initBoard() {
     const NUMBER_ROWS = 6;
-    const NUMBER_COLUMNS = 7;
+    const NUMBER_COLUMNS = 7; // Generar la constante como valor estatico, para que otra clase pueda acceder al valor sin la necesidad de crear un objeto.
     const EMPTY_CHARACTER = " ";
     let cells;
     generateCells();
@@ -210,13 +209,13 @@ function initGameView() {
         let columnNumber;
         do {
           columnNumber = console.readNumber(
-            `Selecciona una columna para insertar FICHA ${player.getToken() === "R" ? "ROJA" : "AMARILLA"}: `
-          ); // Remplazar el String  "R" por algun atributo estatico
+            `Selecciona una columna para insertar FICHA ${player.getToken() === initToken().getRedToken() ? "ROJA" : "AMARILLA"}: `
+          );
           error =
             columnNumber < initBoard().getNumberColumns() - initBoard().getNumberRows() ||
             initBoard().getNumberColumns() < columnNumber;
           if (error) {
-            console.writeln("Error!!! - Por favor elige una columna entre 1 y 7");
+            console.writeln("Error!!! - Por favor elige una columna entre 1 y 7"); // Remplazar los valores magicos por los valores estaticos de la clase initBoard()
           }
         } while (error);
         return columnNumber - (initBoard().getNumberColumns() - initBoard().getNumberRows());
@@ -286,5 +285,18 @@ function initGameView() {
         return initCoordinate(axisX + direction.getAxisX(), axisY + direction.getAxisY());
       },
     };
+  }
+
+  function initToken() {
+    const tokens = ["R", "Y"];
+
+    return {
+      getRedToken: function() {
+        return tokens[0];
+      },
+      getYellowToken: function() {
+        return tokens[1];
+      }
+    }
   }
 }
