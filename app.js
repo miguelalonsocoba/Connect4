@@ -129,16 +129,10 @@ function initGameView() {
       },
       isConnect4: function (coordinateOfLastTokenPlaced) {
         const checker = initChecker(this.getCells());
-        // let directions = [
-        //   [initCoordinate(1, 0), initCoordinate(-1, 0)],
-        //   [initCoordinate(0, 1), initCoordinate(0, -1)],
-        //   [initCoordinate(1, 1), initCoordinate(-1, -1)],
-        //   [initCoordinate(-1, 1), initCoordinate(1, -1)],
-        // ];
         let directions = [
           [initCoordinate(1, 0), initCoordinate(-1, 0)],
           [initCoordinate(0, 1), initCoordinate(0, -1)],
-          [initCoordinate(1, 1), initCoordinate(-1, -1)], ////
+          [initCoordinate(1, 1), initCoordinate(-1, -1)],
           [initCoordinate(-1, 1), initCoordinate(1, -1)],
         ];
         for (let i = 0; i < directions.length; i++) {
@@ -182,7 +176,6 @@ function initGameView() {
         return NUMBER_COLUMNS;
       },
       isThereAGap: function (column) {
-        // Cambiar el nombre por "hay hueco en esta columna"
         let firstRow = 0;
         if (cells[firstRow][column] !== EMPTY_CHARACTER) {
           return true;
@@ -249,19 +242,21 @@ function initGameView() {
     function isWithinTheRange(coordinate) {
       let RANGE_X = 6;
       let RANGE_Y = 5;
-      return coordinate.getAxisX() <= RANGE_X && coordinate.getAxisY() <= RANGE_Y;
+      let MINOR_RANGE = 0;
+      return (
+        MINOR_RANGE <= coordinate.getAxisX() &&
+        coordinate.getAxisX() <= RANGE_X &&
+        MINOR_RANGE <= coordinate.getAxisY() &&
+        coordinate.getAxisY() <= RANGE_Y
+      );
     }
 
     return {
       review: function (directions, coordinateOfLastTokenPlaced) {
-        console.writeln(`Direction 1: ${directions[0].getAxisX()}, ${directions[0].getAxisY()}`);
-        console.writeln(`Direction 2: ${directions[1].getAxisX()}, ${directions[1].getAxisY()}`);
-        console.writeln(`Coordinate: ${coordinateOfLastTokenPlaced.getAxisX()}, ${coordinateOfLastTokenPlaced.getAxisY()}`);
         let count = 1; // 1
         let displacedCoordinate;
         for (let i = 0; i < directions.length; i++) {
           displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplacedIn(directions[i]);
-          console.writeln(`Displaced Coordinate: ${displacedCoordinate.getAxisX()}, ${displacedCoordinate.getAxisY()}`);
           while (
             isWithinTheRange(displacedCoordinate) &&
             cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] ===
