@@ -114,18 +114,6 @@ function initGameView() {
       getCells: function () {
         return cells;
       },
-      getNumberAttempts: function (activePlayer) {
-        const attempts = 3;
-        let countAttempts = 0;
-        for (let i = 0; i < NUMBER_ROWS; i++) {
-          for (let j = 0; j < NUMBER_COLUMNS; j++) {
-            if (cells[i][j] === activePlayer) {
-              countAttempts++;
-            }
-          }
-        }
-        return countAttempts;
-      },
       isConnect4: function (coordinateOfLastTokenPlaced) {
         const checker = initChecker(this.getCells());
         let directions = [
@@ -141,7 +129,7 @@ function initGameView() {
         }
         return false;
       },
-      isTie: function () {
+      isTie: function () { // Remplazar por un forEch
         for (let i = 0; i < NUMBER_ROWS; i++) {
           for (let j = 0; j < NUMBER_COLUMNS; j++) {
             if (cells[i][j] === EMPTY_CHARACTER) {
@@ -239,9 +227,9 @@ function initGameView() {
 
   function initChecker(cells) {
     function isWithinTheRange(coordinate) {
-      let RANGE_X = 6;
-      let RANGE_Y = 5;
-      let MINOR_RANGE = 0;
+      const RANGE_X = 6;
+      const RANGE_Y = 5;
+      const MINOR_RANGE = 0;
       return (
         MINOR_RANGE <= coordinate.getAxisX() &&
         coordinate.getAxisX() <= RANGE_X &&
@@ -254,7 +242,7 @@ function initGameView() {
       review: function (directions, coordinateOfLastTokenPlaced) {
         let count = 1; // 1
         let displacedCoordinate;
-        for (let i = 0; i < directions.length; i++) {
+        for (let i = 0; i < directions.length; i++) { // Remplazar por forEach
           displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplacedIn(directions[i]);
           while (
             isWithinTheRange(displacedCoordinate) &&
