@@ -1,0 +1,97 @@
+@startuml
+
+class Connect4View {
+  + void play()
+}
+
+class GameView {
+  - array[] tokens
+  - void getValidAndNonFullColumn()
+  + void play()
+}
+
+class YesNoDialogView {
+  - String question
+  - String answer
+  
+  + read()
+  + isAffirmative()
+  - isNegative()
+}
+
+class BoardView {
+  - Board Board
+  
+  + void show()
+  + void showWinningMessage()
+}
+class Board {
+  - number NUMBER_ROWS
+  - number NUMBER_COLUMNS
+  - string EMPTY_CHARACTER
+  - array[][] cells
+
+  + array getCells()
+  + number getNumberAttempts(activePlayer)
+  + boolan isConnect4(token)
+  + boolean isTie()
+  + void add(token, column)
+  + number getNumberRows()
+  + number getNumberColumns()
+  + boolean isThereAGap(column)
+  
+  - void generateCells()
+}
+class Player {
+  - string token
+  
+  + string getToken()
+}
+class PlayerView {
+  + number getValidColumn()
+}
+class Turn {
+  - number MAX_PLAYERS
+  - number turn
+  
+  + void nextTurn()
+  + getTurn()
+}
+
+class Checker {
+  - array[][] cells
+  
+  + boolean review(directions, coordinateOfLastTokenPlaced)
+  
+  - boolean isWithinTheRange(coordinate)
+}
+class Coordinate {
+  - number axisX
+  - number axisY
+  
+  + number getAxisX()
+  + number getAxisY()
+  + Coordinate asYpuAreDisplacedIn(direction)
+}
+
+Connect4View --> YesNoDialogView
+Connect4View *-- GameView
+
+GameView *-- BoardView
+GameView *-- Board
+GameView *-- "2" Player
+GameView *-- PlayerView
+GameView *-- Turn
+
+BoardView --> Board
+
+Board --> "2" Player
+Board ..> Checker
+
+PlayerView ..> Board
+PlayerView ..> Player
+
+Checker ..> Coordinate
+
+Turn --> "2" Player
+@enduml
