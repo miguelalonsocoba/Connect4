@@ -28,15 +28,15 @@ function Checker(cells) {
 }
 
 Checker.prototype.review = function (coordinates, coordinateOfLastTokenPlaced) {
-  let count = 1; 
+  let count = 1;
   let displacedCoordinate;
   const lineLength = 4;
   for (let i = 0; i < coordinates.length; i++) {
     displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplaced(coordinates[i]);
     while (
       isWithinTheRange(displacedCoordinate) &&
-      this.cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()]
-       === this.cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]
+      this.cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] ===
+        this.cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]
     ) {
       count++;
       displacedCoordinate = displacedCoordinate.asYouAreDisplaced(coordinates[i]);
@@ -154,9 +154,9 @@ Board.prototype.isConnect4 = function (coordinateOfLastTokenPlaced) {
   ];
 
   for (let i = 0; i < directions.length; i++) {
-      if (checker.review(directions[i], coordinateOfLastTokenPlaced)) {
-          return true;
-      }
+    if (checker.review(directions[i], coordinateOfLastTokenPlaced)) {
+      return true;
+    }
   }
   return false;
 };
@@ -281,5 +281,4 @@ Connect4View.prototype.play = function () {
   } while (continueDialogView.isAffirmative());
 };
 
-let game = new Connect4View();
-game.play();
+new Connect4View().play();
