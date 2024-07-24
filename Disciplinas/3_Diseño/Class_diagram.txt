@@ -5,7 +5,12 @@ class Connect4View {
 }
 
 class GameView {
-  - array[] tokens
+  - Board board
+  - Turn turn
+  - BoardView boardView
+  - [] players
+  - PlayerView playerView
+
   - void getValidAndNonFullColumn()
   + void play()
 }
@@ -15,53 +20,51 @@ class YesNoDialogView {
   - String answer
   
   + read()
-  + isAffirmative()
-  - isNegative()
+  + boolean isAffirmative()
+  - boolean isNegative()
 }
 
 class BoardView {
-  - Board Board
+  - Board board
   
   + void show()
   + void showWinningMessage()
+  + void showTieMessage()
 }
 class Board {
-  - number NUMBER_ROWS
-  - number NUMBER_COLUMNS
-  - string EMPTY_CHARACTER
-  - array[][] cells
+  - [] cells
+  + number ROWS
+  + number COLUMNS
+  + string EMPTY_CHARACTER
 
+  - void generateCells(Board)
   + array getCells()
-  + number getNumberAttempts(activePlayer)
-  + boolan isConnect4(token)
+  + boolean isConnect4(token)
   + boolean isTie()
   + void add(token, column)
-  + number getNumberRows()
-  + number getNumberColumns()
+  + Coordinate getCoordinateOfLastAddedToken(token, column) 
   + boolean isThereAGap(column)
-  
-  - void generateCells()
 }
 class Player {
-  - string token
+  - Token token
   
-  + string getToken()
+  + Token getToken()
 }
 class PlayerView {
   + number getValidColumn()
 }
 class Turn {
-  - number MAX_PLAYERS
   - number turn
+  - number MAX_PLAYERS
   
   + void nextTurn()
-  + getTurn()
+  + number getTurn()
 }
 
 class Checker {
-  - array[][] cells
+  - [][] cells
   
-  + boolean review(directions, coordinateOfLastTokenPlaced)
+  + boolean review([] Coordinate, coordinateOfLastTokenPlaced)
   
   - boolean isWithinTheRange(coordinate)
 }
@@ -74,8 +77,13 @@ class Coordinate {
   + Coordinate asYpuAreDisplacedIn(direction)
 }
 
+class Token {
+  + string RED
+  + string YELLOW
+}
+
 Connect4View --> YesNoDialogView
-Connect4View *-- GameView
+Connect4View --> GameView
 
 GameView *-- BoardView
 GameView *-- Board
@@ -83,15 +91,19 @@ GameView *-- "2" Player
 GameView *-- PlayerView
 GameView *-- Turn
 
-BoardView --> Board
+BoardView *-- Board
+BoardView ..> Turn
 
 Board --> "2" Player
 Board ..> Checker
+Board ..> Coordinate
 
 PlayerView ..> Board
 PlayerView ..> Player
 
 Checker ..> Coordinate
 
-Turn --> "2" Player
+Player *-- Token
+
+Coordinate ..> Coordinate
 @enduml
