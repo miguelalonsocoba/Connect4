@@ -4,7 +4,7 @@ const console = new Console();
 function Token() {}
 
 Token.RED = "R";
-Token.Yellow = "Y";
+Token.YELLOW = "Y";
 
 function Coordinate(axisX, axisY) {
   this.axisX = axisX;
@@ -28,15 +28,15 @@ function Checker(cells) {
 }
 
 Checker.prototype.review = function (coordinates, coordinateOfLastTokenPlaced) {
-  let count = 1; 
+  let count = 1;
   let displacedCoordinate;
   const lineLength = 4;
   for (let i = 0; i < coordinates.length; i++) {
     displacedCoordinate = coordinateOfLastTokenPlaced.asYouAreDisplaced(coordinates[i]);
     while (
       isWithinTheRange(displacedCoordinate) &&
-      this.cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()]
-       === this.cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]
+      this.cells[coordinateOfLastTokenPlaced.getAxisY()][coordinateOfLastTokenPlaced.getAxisX()] ===
+        this.cells[displacedCoordinate.getAxisY()][displacedCoordinate.getAxisX()]
     ) {
       count++;
       displacedCoordinate = displacedCoordinate.asYouAreDisplaced(coordinates[i]);
@@ -154,9 +154,9 @@ Board.prototype.isConnect4 = function (coordinateOfLastTokenPlaced) {
   ];
 
   for (let i = 0; i < directions.length; i++) {
-      if (checker.review(directions[i], coordinateOfLastTokenPlaced)) {
-          return true;
-      }
+    if (checker.review(directions[i], coordinateOfLastTokenPlaced)) {
+      return true;
+    }
   }
   return false;
 };
@@ -205,8 +205,8 @@ Board.prototype.isThereAGap = function (column) {
 function GameView() {
   this.board = new Board();
   this.turn = new Turn();
-  this.boardView = new BoardView(this.board, this.turn);
-  this.players = [new Player(Token.RED), new Player(Token.Yellow)];
+  this.boardView = new BoardView(this.board);
+  this.players = [new Player(Token.RED), new Player(Token.YELLOW)];
   this.playerView = new PlayerView();
 }
 
@@ -281,5 +281,4 @@ Connect4View.prototype.play = function () {
   } while (continueDialogView.isAffirmative());
 };
 
-let game = new Connect4View();
-game.play();
+new Connect4View().play();
