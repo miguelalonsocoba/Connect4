@@ -4,7 +4,7 @@ const console = new Console();
 function Token() {}
 
 Token.RED = "R";
-Token.Yellow = "Y";
+Token.YELLOW = "Y";
 
 function Coordinate(axisX, axisY) {
   this.axisX = axisX;
@@ -205,8 +205,8 @@ Board.prototype.isThereAGap = function (column) {
 function GameView() {
   this.board = new Board();
   this.turn = new Turn();
-  this.boardView = new BoardView(this.board, this.turn);
-  this.players = [new Player(Token.RED), new Player(Token.Yellow)];
+  this.boardView = new BoardView(this.board);
+  this.players = [new Player(Token.RED), new Player(Token.YELLOW)];
   this.playerView = new PlayerView();
 }
 
