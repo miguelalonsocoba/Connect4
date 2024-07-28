@@ -385,7 +385,7 @@ class YesNoDialog {
     do {
       console.write(question);
       this.#answer = console.readString(YesNoDialog.#SUFFIX);
-      ok = this.isAffirmative || this.#isNegative();
+      ok = this.isAffirmative() || this.#isNegative();
       if (!ok) {
         console.writeln(YesNoDialog.#ERROR_MESSAGE);
       }
