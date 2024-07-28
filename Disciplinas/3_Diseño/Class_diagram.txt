@@ -1,109 +1,172 @@
 @startuml
-
-class Connect4View {
-  + void play()
-}
-
-class GameView {
+class Connect4 {
   - Board board
   - Turn turn
-  - BoardView boardView
-  - [] players
-  - PlayerView playerView
 
-  - void getValidAndNonFullColumn()
-  + void play()
+  + void playGames()
+  - void playGame()
+  - boolean isResumed()
 }
 
-class YesNoDialogView {
-  - String question
-  - String answer
-  
-  + read()
-  + boolean isAffirmative()
-  - boolean isNegative()
+class YesNoDialog{
+  {static} - AFFIRMATIVE
+  {static} - NEGATIVE
+  {static} - SUFFIX
+  {static} - MESSAGE
+  - answer
+
+  + void read(message)
+  + isAffirmative()
+  - isNegative()
+  - getAnswer()
 }
 
-class BoardView {
+class Turn{
+  {static} - NUMBERS_PLAYERS
+  - [Player] players
+  - number activePlayer
   - Board board
-  
-  + void show()
-  + void showWinningMessage()
-  + void showTieMessage()
+
+  + void reset()
+  + void play()
+  + void writeResult()
 }
+
 class Board {
-  - [] cells
-  + number ROWS
-  + number COLUMNS
-  + string EMPTY_CHARACTER
+  - [Colors] colors
+  - Coordinate lastDrop
 
-  - void generateCells(Board)
-  + array getCells()
-  + boolean isConnect4(token)
-  + boolean isTie()
-  + void add(token, column)
-  + Coordinate getCoordinateOfLastAddedToken(token, column) 
-  + boolean isThereAGap(column)
+  - void reset()
+  + void dropToken(column, color)
+  + boolean isComplete(column)
+  + boolean isFinished()
+  + boolean isWinner()
+  - boolean isConnect4(line)
+  + void writeln()
+  - void writeHorizontal()
+  - boolean isOccupied(coordinate, color)
+  - boolean isEmpty(coordinate)
+  - string getColor(coordinate)
 }
+
+class Message{
+  {static} TITLE
+  {static} HORIZONTAL_LINE
+  {static} VERTICAL_LINE
+  {static} TURN
+  {static} ENTER_COLUMN_TO_DROP
+  {static} INVALID_COLUMN
+  {static} COMPLETED_COLUMN
+  {static} PLAYER_WIN
+  {static} PLAYERS_TIED
+  {static} RESUM
+  - string string
+
+  + void write()
+  + void writeln()
+  + string toString()
+}
+
 class Player {
-  - Token token
-  
-  + Token getToken()
-}
-class PlayerView {
-  + number getValidColumn()
-}
-class Turn {
-  - number turn
-  - number MAX_PLAYERS
-  
-  + void nextTurn()
-  + number getTurn()
+  - Color color
+  - Board board
+
+  + void play()
+  + void writeWinner()
 }
 
-class Checker {
-  - [][] cells
-  
-  + boolean review([] Coordinate, coordinateOfLastTokenPlaced)
-  
-  - boolean isWithinTheRange(coordinate)
+class Color {
+  - {static} RED
+  - {static} YELLOW
+  - {static} NULL
+  - string string
+
+  + {static} get(ordinal)
+  - {static} values()
+  + void write()
+  + string toString()
 }
+
 class Coordinate {
-  - number axisX
-  - number axisY
-  
-  + number getAxisX()
-  + number getAxisY()
-  + Coordinate asYpuAreDisplacedIn(direction)
+  {static} ORIGIN
+  {static} NUMBER_ROWS
+  {static} #ROWS
+  {static} NUMBER_COLUMNS
+  {static} #COLUMNS
+  - number row
+  - number column
+
+  + Coordinate shifted(coordinate)
+  + boolean isValid()
+  + {static} boolean isColumnValid(column)
+  - {static} boolean isRowValid(row)
+  + number getRow()
+  + number getColumn()
+  + boolean equals(coordinate)
 }
 
-class Token {
-  + string RED
-  + string YELLOW
+class Direction {
+  {static} NORTH
+  {static} NORTH_EAST
+  {static} EAST
+  {static} SOUTH_EAST
+  {static} SOUTH
+  {static} SOUTH_WEST
+  {static} WEST
+  {static} NORTH_WEST
+  - Coordinate coordinate
+
+  + Direction getOposite()
+  - {static} values()
+  + Coordinate getCoordinate()
+  - {static} halfValues()
 }
 
-Connect4View --> YesNoDialogView
-Connect4View --> GameView
+class Line {
+  + {static} LENGTH
+  - Coordinate origin
+  - [Coordinate] coordinates
+  - Direction oppositeDirection
 
-GameView *-- BoardView
-GameView *-- Board
-GameView *-- "2" Player
-GameView *-- PlayerView
-GameView *-- Turn
+  + void set(direction)
+  + void shift()
+  + [Coordinate] getCoordinate()
+}
 
-BoardView *-- Board
-BoardView ..> Turn
+class ClosedInterval {
+  - number min
+  - number max
 
-Board --> "2" Player
-Board ..> Checker
-Board ..> Coordinate
+  + boolean isInclude(value)
+}
 
-PlayerView ..> Board
-PlayerView ..> Player
+Connect4 *-- Board
+Connect4 *-- Turn
+Connect4 ..> Message
+Connect4 ..> YesNoDialog
 
-Checker ..> Coordinate
+Turn --> Board
+Turn --> "2"Player
 
-Player *-- Token
+Player *-- Color
+Player --> Board
+Player ..> Message
+Player ..> Coordinate
 
-Coordinate ..> Coordinate
+Board o-- "*"Color
+Board --> "*"Coordinate
+Board ..> Direction
+Board ..> Line
+Board ..> Message
+
+Line --> Coordinate
+
+Message --> Message
+
+Direction --> Direction
+Direction --> Coordinate
+
+Coordinate --> ClosedInterval
+
+Color --> Color
 @enduml
