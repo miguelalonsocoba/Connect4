@@ -190,7 +190,7 @@ class Line {
     }
   }
 
-  getCoordinate() {
+  getCoordinates() {
     return this.#coordinates;
   }
 }
@@ -210,7 +210,7 @@ class Board {
   reset() {
     for (let i = 0; i < Coordinate.NUMBER_ROWS; i++) {
       for (let j = 0; j < Coordinate.NUMBER_COLUMNS; j++) {
-        this.#colors[i][j] = Colors.NULL;
+        this.#colors[i][j] = Color.NULL;
       }
     }
   }
@@ -225,7 +225,7 @@ class Board {
 
   isComplete(column) {
     if (column !== undefined) {
-      return !this.isEmpty(new Coordinate(Coordinate.NUMBER_ROWS - 1, column));
+      return !this.#isEmpty(new Coordinate(Coordinate.NUMBER_ROWS - 1, column));
     }
     for (let i = 0; i < Coordinate.NUMBER_COLUMNS; i++) {
       if (!this.isComplete(i)) {
@@ -272,7 +272,7 @@ class Board {
   writeln() {
     this.#writeHorizontal();
     for (let i = Coordinate.NUMBER_ROWS - 1; i >= 0; i--) {
-      Message.VERTICAL.write();
+      Message.VERTICAL_LINE.write();
       for (let j = 0; j < Coordinate.NUMBER_COLUMNS; j++) {
         this.#getColor(new Coordinate(i, j)).write();
         Message.VERTICAL_LINE.write();
@@ -283,7 +283,7 @@ class Board {
   }
 
   #writeHorizontal() {
-    for (let i = 0; i < Line.LENGTH * Coordinate.NUMBER_COLUMNS; i++) {
+    for (let i = 0; i < (Line.LENGTH - 1) * Coordinate.NUMBER_COLUMNS; i++) {
       Message.HORIZONTAL_LINE.write();
     }
     Message.HORIZONTAL_LINE.writeln();
@@ -324,7 +324,7 @@ class Player {
       } else {
         valid = !this.#board.isComplete(column);
         if (!valid) {
-          Message.COMPLETE_COLUMN.writeln();
+          Message.COMPLETED_COLUMN.writeln();
         }
       }
     } while (!valid);
@@ -344,7 +344,7 @@ class Turn {
   #activePlayer;
   #board;
 
-  consturctor(board) {
+  constructor(board) {
     this.#board = board;
     this.#players = [];
     this.reset();
@@ -368,7 +368,7 @@ class Turn {
     if (this.#board.isWinner()) {
       this.#players[this.#activePlayer].writeWinner();
     } else {
-      Message.PLAYER_TIED.writeln();
+      Message.PLAYERS_TIED.writeln();
     }
   }
 }
@@ -421,7 +421,7 @@ class Connect4 {
   }
 
   #playGame() {
-    Message.TTITLE.writeln();
+    Message.TITLE.writeln();
     this.#board.writeln();
     do {
       this.#turn.play();
