@@ -2,13 +2,15 @@
 class Connect4 {
   - Board board
   - Turn turn
+  - BoardConsoleView BoardConsoleView
+  - TurnConsoleView turnView
 
   + void playGames()
   - void playGame()
   - boolean isResumed()
 }
 
-class YesNoDialog{
+class YesNoDialog {
   {static} - AFFIRMATIVE
   {static} - NEGATIVE
   {static} - SUFFIX
@@ -21,19 +23,28 @@ class YesNoDialog{
   - getAnswer()
 }
 
-class Turn{
+class Turn {
   {static} - NUMBERS_PLAYERS
   - [Player] players
   - number activePlayer
   - Board board
 
   + void reset()
+  + void nextTurn()
+  + boolean isFinished()
+  + boolean isWinner()
+  + Player getActivePlayer()
+}
+
+class TurnConsoleView {
+  - Turn turn
+
   + void play()
   + void writeResult()
 }
 
 class Board {
-  - [Colors] colors
+  - [Color] colors
   - Coordinate lastDrop
 
   - void reset()
@@ -42,11 +53,16 @@ class Board {
   + boolean isFinished()
   + boolean isWinner()
   - boolean isConnect4(line)
-  + void writeln()
-  - void writeHorizontal()
   - boolean isOccupied(coordinate, color)
   - boolean isEmpty(coordinate)
   - string getColor(coordinate)
+}
+
+class BoardConsoleView {
+  - Board board
+
+  + void writeln()
+  - void writeHorizontal()
 }
 
 class Message{
@@ -71,6 +87,14 @@ class Player {
   - Color color
   - Board board
 
+  + void dropToken(column)
+  + boolean isComplete(column)
+  + Color getColor()
+}
+
+class PlayerConsoleView {
+  - Player player
+
   + void play()
   + void writeWinner()
 }
@@ -83,8 +107,13 @@ class Color {
 
   + {static} get(ordinal)
   - {static} values()
-  + void write()
   + string toString()
+}
+
+class ColorConsoleView {
+  - Colro color
+
+  + void write()
 }
 
 class Coordinate {
@@ -103,6 +132,7 @@ class Coordinate {
   + number getRow()
   + number getColumn()
   + boolean equals(coordinate)
+  + string toString()
 }
 
 class Direction {
@@ -117,13 +147,13 @@ class Direction {
   - Coordinate coordinate
 
   + Direction getOposite()
-  - {static} values()
+  - {static} [Direction] values()
   + Coordinate getCoordinate()
   - {static} halfValues()
 }
 
 class Line {
-  + {static} LENGTH
+  + {static} LENGTH = 4
   - Coordinate origin
   - [Coordinate] coordinates
   - Direction oppositeDirection
@@ -144,29 +174,44 @@ Connect4 *-- Board
 Connect4 *-- Turn
 Connect4 ..> Message
 Connect4 ..> YesNoDialog
+Connect4 *-- BoardConsoleView
+Connect4 *-- TurnConsoleView
 
 Turn --> Board
 Turn --> "2"Player
 
+TurnConsoleView *-- Turn
+TurnConsoleView ..> Message
+TurnConsoleView --> PlayerConsoleView
+
 Player *-- Color
 Player --> Board
-Player ..> Message
-Player ..> Coordinate
 
-Board o-- "*"Color
-Board --> "*"Coordinate
+PlayerConsoleView *-- Player
+PlayerConsoleView ..> Message
+
+Board o-- "*" Color
+Board --> "*" Coordinate
 Board ..> Direction
 Board ..> Line
 Board ..> Message
 
-Line --> Coordinate
+BoardConsoleView *-- Board
+BoardConsoleView ..> Message
+BoardConsoleView ..> Coordinate
+BoardConsoleView ..> ColorConsoleView
+
+Line *-- "*" Coordinate
+Line *-- Direction
 
 Message --> Message
 
 Direction --> Direction
-Direction --> Coordinate
+Direction --> "*" Coordinate
 
-Coordinate --> ClosedInterval
+Coordinate --> "*" ClosedInterval
 
 Color --> Color
+
+ColorConsoleView *-- Color
 @enduml
