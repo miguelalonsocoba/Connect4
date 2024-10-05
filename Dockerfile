@@ -8,7 +8,7 @@ RUN npm install --production
 FROM node:lts-alpine3.19 as runner
 WORKDIR /app
 COPY --from=prod-dependencies /app/node_modules ./node_modules
-COPY app.js ./
+COPY ./ ./
 COPY package.json ./
 CMD [ "node", "app.js" ]
 
