@@ -146,6 +146,8 @@ class Message {
   static PLAYER_WIN = new Message(`#colorS WIN!!! : -)`);
   static PLAYERS_TIED = new Message(`TIED!!!`);
   static RESUME = new Message(`Do you want to continue`);
+  static ENTER_RANDOM_PLAYERS = new Message(`Enter the number of random players: `);
+  static INVALID_NUMBER_OF_PLAYERS = new Message(`Number of random players must be equal to or less than #numberOfPlayers`);
 
   #string;
 
@@ -311,10 +313,9 @@ class Player {
     this.#board = board;
   }
 
-  play() {
+  play(column) {
     Message.TURN.write();
     console.writeln(this.#color.toString());
-    let column = this.getColumn();
     this.#board.dropToken(column, this.#color);
   }
 
@@ -330,11 +331,14 @@ class Player {
   }
 }
 
-class UserPlayer extends Player {
+class UserPlayer {
+  #player;
+
   constructor(color, board) {
-    super(color, board);
+    this.#player = new Player(color, board);
   }
-  getColumn() {
+
+  play() {
     let column;
     let valid;
     do {
@@ -343,27 +347,37 @@ class UserPlayer extends Player {
       if (!valid) {
         Message.INVALID_COLUMN.writeln();
       } else {
-        valid = !this.isComplete(column);
+        valid = !this.#player.isComplete(column);
         if (!valid) {
           Message.COMPLETED_COLUMN.writeln();
         }
       }
     } while (!valid);
-    return column;
+    this.#player.play(column);
+  }
+
+  writeWinner() {
+    this.#player.writeWinner();
   }
 }
 
-class RandomPlayer extends Player {
+class RandomPlayer {
+  #player;
   constructor(color, board) {
-    super(color, board);
+    this.#player = new Player(color, board);
   }
-  getColumn() {
+
+  play() {
     let column;
     do {
       column = Math.floor(Math.random() * Coordinate.NUMBER_COLUMNS);
-    } while (this.isComplete(column));
+    } while (this.#player.isComplete(column));
     console.writeln(`Randomly in the column: ${column}`);
-    return column;
+    this.#player.play(column);
+  }
+
+  writeWinner() {
+    this.#player.writeWinner();
   }
 }
 
@@ -380,8 +394,22 @@ class Turn {
   }
 
   reset() {
+    let numberRandomPlayers;
+    do {
+      numberRandomPlayers = console.readNumber(Message.ENTER_RANDOM_PLAYERS.toString());
+      if (numberRandomPlayers > Turn.#NUMBER_PLAYERS) {
+        new Message(
+          Message.INVALID_NUMBER_OF_PLAYERS.toString().replace(`#numberOfPlayers`, Turn.#NUMBER_PLAYERS.toString())
+        ).writeln();
+      }
+    } while (numberRandomPlayers > Turn.#NUMBER_PLAYERS);
+
     for (let i = 0; i < Turn.#NUMBER_PLAYERS; i++) {
-      this.#players[i] = new RandomPlayer(Color.get(i), this.#board);
+      if (i < numberRandomPlayers) {
+        this.#players[i] = new RandomPlayer(Color.get(i), this.#board);
+      } else {
+        this.#players[i] = new UserPlayer(Color.get(i), this.#board);
+      }
     }
     this.#activePlayer = 0;
   }
